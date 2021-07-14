@@ -1,0 +1,22 @@
+#!/bin/bash
+
+a=$(sensors | grep "Core 0" | awk '{print $3}' | sed 's/[+°C]//g' | cut -c -2)
+b=70
+
+date
+
+if (( "$a" <= "$b" ))
+then 
+	echo "HUMAN!! the E6850 temp is: $a, so this is OKAY"
+else
+	echo "HUMAN!! It is not OKAY the E6850 temp is: $a so"
+	echo "HUMAN!! I am stopping the service samba"
+        systemctl stop smb.service
+	echo "HUMAN! Now I am dismounting the partition"
+	systemctl stop mnt-wd_blue.mount
+	systemctl stop mnt-wd_green.mount
+	systemctl stop mnt-wd_velociraptor.mount
+	systemctl stop partage.mount
+	shutdown -h now
+	echo "HUMAN!! it is done now"
+fi
